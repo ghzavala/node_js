@@ -1,0 +1,19 @@
+{
+  "name": "node_js",
+  "version": "1.0.0",
+  "description": "Primer contacto con NodeJS",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ghzavala/node_js.git"
+  },
+  "author": "ghzavala",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ghzavala/node_js/issues"
+  },
+  "homepage": "https://github.com/ghzavala/node_js#readme"
+}
