@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ghzavala/node_js#readme",
   "dependencies": {
-    "http": "0.0.1-security"
+    "http": "0.0.1-security",
+    "nodemon": "^2.0.6"
   }
 }
