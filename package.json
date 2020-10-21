@@ -1,6 +1,6 @@
 {
   "name": "node_js",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Primer contacto con NodeJS",
   "main": "app.js",
   "scripts": {
@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/ghzavala/node_js/issues"
   },
-  "homepage": "https://github.com/ghzavala/node_js#readme"
+  "homepage": "https://github.com/ghzavala/node_js#readme",
+  "dependencies": {
+    "http": "0.0.1-security"
+  }
 }
