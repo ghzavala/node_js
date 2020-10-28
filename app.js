@@ -13,6 +13,7 @@ const miniOutlook = nodemailer.createTransport({
     }
 });
 
+
 app.listen( port )
 app.use( express.static("public") ) // las configuraciones que le damos
 app.use( express.urlencoded({ extended : true }) )
