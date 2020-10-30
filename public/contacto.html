@@ -7,18 +7,19 @@
 	</head>
 	<body class="container">
 		<h1>Formulario HTML</h1>
-		<form action="enviar" method="post">  <!--- Action indica a donde vamos a enviar los datos -->
+		<form action="enviar" method="post" enctype="multipart/form-data">  <!--- Action indica a donde vamos a enviar los datos / form-data envía archivos -->
 
 			<label for="nombre">Ingrese su nombre:</label>
 			<input class="form-control" type="text" name="nombre" placeholder="Ej: Obi Juan">
 			
 			<br>
 
-			<label for="apellid">Ingrese su apellido:</label>
+			<label for="apellido">Ingrese su apellido:</label>
 			<input class="form-control" type="text" name="apellido" placeholder="Ej: Kenobi">
 			
 			<br>
-						<label for="correo">Ingrese su E-Mail:</label>
+			
+			<label for="correo">Ingrese su E-Mail:</label>
 			<input class="form-control" type="email" name="correo" placeholder="Ej: obi.juan@jedi.com">
 
 			<br>
@@ -35,6 +36,11 @@
 
 			<label for="mensaje">Ingrese su mensaje:</label>
 			<textarea class="form-control" name="mensaje" cols="30" rows="10" placeholder="Max: 100 caracteres"></textarea>
+
+			<br>
+
+			<label for="archivo">Ingrese el archivo a adjuntar</label>
+			<input type="file" class="form-control-file" name="archivo">
 
 			<br>
 

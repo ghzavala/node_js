@@ -1,11 +1,9 @@
-// TAREA: agregar Apellido y casilla para archivo. y que funcione joi
-
-
 require("dotenv").config()
 const express = require("express")
 const app = express()
 const nodemailer = require("nodemailer")
 const joi = require("joi")
+const expressFileUpload = require("express-fileupload")
 
 const port = 1000   //mas allá del 1000 usualmente están disponibles
 
@@ -42,8 +40,11 @@ const schema = joi.object({
 })
 
 app.listen( port )
+// Middlewares //
 app.use( express.static("public") ) // las configuraciones que le damos
-app.use( express.urlencoded({ extended : true }) )
+app.use( express.json() ) // de application/json a Object
+app.use( express.urlencoded({ extended : true }) ) //convierte de x-www-form-urlencoded a objeto
+app.use( expressFileUpload() )
 
 /*
 Plantilla modelo para "endpoints" de express()
@@ -53,6 +54,15 @@ app.TIPO_HTTP("/RUTA", (req, res) => { LO QUE TIENE QUE HACER})
 
 app.post("/enviar", (req, res) => {
     const contacto = req.body
+    const { archivo } = req.files
+
+    console.log(req.files)
+
+    const ubicacion = __dirname + "/public/uploads/" + archivo.name
+    archivo.mv( ubicacion )
+    console.log( ubicacion )
+    return res.end("Mira la consola")
+
 
     const validate = schema.validate( contacto )
     
@@ -69,7 +79,7 @@ app.post("/enviar", (req, res) => {
         res.end("Ahora vamos a enviar un email de contacto :O")
         
     } else {
-
+        console.log(validate.error)
         res.end(`El ${validate.error.details[0].context.key} ingresado no es correcto. Por favor verifique los datos.`)
         
     }
