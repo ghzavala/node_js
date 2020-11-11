@@ -142,13 +142,14 @@ API.post("/v2/pelicula", (req, res) => {
     res.json(respuesta)
 })
 //***** Read ****/
-API.get("/v1/pelicula", (req, res) => {
-    const client = MongoClient.connect( ConnectionString, { useUnifiedTopology : true } ) 
-    {
-        msg: "Acá vamos a ver peliculas..."
-    }
+API.get("/v1/pelicula", async (req, res) => {
+    const client = await MongoClient.connect( ConnectionString, { useUnifiedTopology : true } ) 
     
-    res.json(respuesta)
+    const db = await client.db( "Catalogo" )
+
+    const peliculas = await db.collection('Peliculas').find({}).toArray()
+    
+    res.json(peliculas)
 })
 //***** Update ****/
 API.put("api/pelicula", (req, res) => {
