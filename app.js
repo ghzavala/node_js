@@ -48,6 +48,12 @@ const schema = joi.object({
 
 const ConnectionString = `mongodb+srv://${MONGODB_USER}:${MONGODB_PASS}@${MONGODB_HOST}/${MONGODB_BASE}?retryWrites=true&w=majority`
 
+const ConnectionDB = async () => {
+    const client = await MongoClient.connect( ConnectionString, { useUnifiedTopology : true } ) 
+    
+    return await client.db( "Catalogo" )
+}
+
 app.listen( port )
 // Middlewares //
 app.use( express.static("public") ) // las configuraciones que le damos
@@ -124,8 +130,11 @@ app.post("/enviar", (req, res) => {
 
 /************** API ***************************/
 //***** Create ****/
-API.post("/v1/pelicula", (req, res) => {
+API.post("/v1/pelicula", async (req, res) => {
     //db.getCollection('Peliculas').find({})
+    
+    const db = await ConnectionDB()
+    
     const respuesta = {
         msg: "Acá vamos a crear peliculas..."
     }
@@ -133,26 +142,20 @@ API.post("/v1/pelicula", (req, res) => {
     res.json(respuesta)
 })
 
-API.post("/v2/pelicula", (req, res) => {
-    //db.getCollection('Peliculas').find({})
-    const respuesta = {
-        msg: "Acá vamos a crear peliculas con mas asado..."
-    }
-    
-    res.json(respuesta)
-})
 //***** Read ****/
 API.get("/v1/pelicula", async (req, res) => {
-    const client = await MongoClient.connect( ConnectionString, { useUnifiedTopology : true } ) 
-    
-    const db = await client.db( "Catalogo" )
+
+    const db = await ConnectionDB()
 
     const peliculas = await db.collection('Peliculas').find({}).toArray()
     
     res.json(peliculas)
 })
 //***** Update ****/
-API.put("api/pelicula", (req, res) => {
+API.put("/v1/pelicula", async (req, res) => {
+    
+    const db = await ConnectionDB()
+    
     const respuesta = {
         msg: "Acá vamos a actualizar peliculas..."
     }
@@ -160,7 +163,10 @@ API.put("api/pelicula", (req, res) => {
     res.json(respuesta)
 })
 //***** Delete ****/
-API.delete("api/pelicula", (req, res) => {
+API.delete("/v1/pelicula", async (req, res) => {
+    
+    const db = await ConnectionDB()
+    
     const respuesta = {
         msg: "Acá vamos a borrar peliculas..."
     }
