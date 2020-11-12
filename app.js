@@ -4,7 +4,7 @@ const app = express()
 const nodemailer = require("nodemailer")
 const joi = require("joi")
 const expressFileUpload = require("express-fileupload")
-const { MongoClient } = require("mongodb") // porque la app es cliente || si fuera servidor MongoServer, por ej
+const { MongoClient, ObjectId } = require("mongodb") // porque la app es cliente || si fuera servidor MongoServer, por ej
 
 const API = express.Router()
 
@@ -132,7 +132,7 @@ app.post("/enviar", (req, res) => {
 //***** Create ****/
 API.post("/v1/pelicula", async (req, res) => {
     //db.getCollection('Peliculas').find({})
-    
+
     const db = await ConnectionDB()
     
     const respuesta = {
@@ -144,12 +144,40 @@ API.post("/v1/pelicula", async (req, res) => {
 
 //***** Read ****/
 API.get("/v1/pelicula", async (req, res) => {
+    
+    //console.log( req.query._id ) // Datos HTTP desde query string
 
     const db = await ConnectionDB()
 
     const peliculas = await db.collection('Peliculas').find({}).toArray()
     
     res.json(peliculas)
+})
+
+API.get("/v1/pelicula/:id", async (req, res) => {
+
+    const { id } = req.params
+    
+    // acá viene la validación del id
+
+    try { 
+
+        const db = await ConnectionDB()
+
+        const peliculas = await db.collection('Peliculas')
+    
+        const busqueda = { "_id" : ObjectId( id ) }  // porque MongoDB asigna una función id
+    
+        const resultado = await peliculas.find( busqueda ).toArray()
+
+        return res.json( {ok : true, resultado} )
+
+    } catch(error) {
+
+        return res.json( {ok : false, msg : "Error en la conexión a la base de datos"} )
+
+    }
+
 })
 //***** Update ****/
 API.put("/v1/pelicula", async (req, res) => {
