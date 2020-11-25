@@ -4,13 +4,15 @@ const app = express()
 const nodemailer = require("nodemailer")
 const joi = require("joi")
 const expressFileUpload = require("express-fileupload")
-const { MongoClient, ObjectId } = require("mongodb") // porque la app es cliente || si fuera servidor MongoServer, por ej
+const { MongoClient, ObjectId, ObjectID } = require("mongodb") // porque la app es cliente || si fuera servidor MongoServer, por ej
+const jwt = require('jsonwebtoken')
 
 const API = express.Router()
 
 const { 
     SERVER, USER, PASS, PORT,
-    MONGODB_BASE, MONGODB_HOST, MONGODB_PASS, MONGODB_USER} = process.env
+    MONGODB_BASE, MONGODB_HOST, MONGODB_PASS, MONGODB_USER,
+    JWT_SECRET} = process.env
 
 const port = 1000   //mas allá del 1000 usualmente están disponibles
 
@@ -223,13 +225,41 @@ API.put("/v1/pelicula/:id", async (req, res) => {
     res.json(respuesta)
 })
 //***** Delete ****/
-API.delete("/v1/pelicula", async (req, res) => {
+API.delete("/v1/pelicula/:id", async (req, res) => {
     
+    const { id } = req.params
+    console.log(id)
+
     const db = await ConnectionDB()
     
+    const peliculas = await db.collection('Peliculas')
+
+    const { result } = await peliculas.deleteOne( {"_id" : ObjectId( id )} )
+
+    const { ok } = result
+
+    console.log( result )
+
     const respuesta = {
-        msg: "Acá vamos a borrar peliculas..."
+        ok,
+        msg: ok ? "Pelicula borrada correctamente" : "Error al eliminar la pelicula"
     }
     
     res.json(respuesta)
+})
+
+/* Auth */
+API.get("/v1/auth", (req, res) => {
+    
+    //const token = jwt.sign(PAYLOAD, CONFIG, SECRETKEY)
+    const email = "gzavala@metrogas.com"
+    const name = "Guille Zavala"
+    const userID = "1153778"
+
+    const token = jwt.sign({ email, name, userID, expiresIn : 60 * 60 }, JWT_SECRET)
+
+    console.log( token )
+    
+    res.end("Acá hay que crear JWT")
+
 })
