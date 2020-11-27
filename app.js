@@ -6,6 +6,7 @@ const joi = require("joi")
 const expressFileUpload = require("express-fileupload")
 const { MongoClient, ObjectId, ObjectID } = require("mongodb") // porque la app es cliente || si fuera servidor MongoServer, por ej
 const jwt = require('jsonwebtoken')
+const cookieParser = require('cookie-parser')
 
 const API = express.Router()
 
@@ -56,12 +57,33 @@ const ConnectionDB = async () => {
     return await client.db( "Catalogo" )
 }
 
+const verifyToken = (req, res, next) => {
+    
+    const { _auth } = req.cookies  // extraigo token de cookie
+
+    //jwt.verify(TOKEN, SECRET_WORD, CALLBACK)
+
+    jwt.verify(_auth, JWT_SECRET, (error, data) => {
+
+        if( error ){
+            res.end("ERROR: Token expirado o inválido")
+        } else {
+            next()
+        }
+
+    })
+
+    console.log("Estas son las cookies")
+    console.log(req.cookies)
+}
+
 app.listen( port )
 // Middlewares //
 app.use( express.static("public") ) // las configuraciones que le damos
 app.use( express.json() ) // de application/json a Object
 app.use( express.urlencoded({ extended : true }) ) //convierte de x-www-form-urlencoded a objeto
 app.use( expressFileUpload() )
+app.use( cookieParser() )
 
 app.use("/api", API)
 
@@ -156,7 +178,7 @@ API.post("/v1/pelicula", async (req, res) => {
 })
 
 //***** Read ****/
-API.get("/v1/pelicula", async (req, res) => {
+API.get("/v1/pelicula", verifyToken, async (req, res) => {
     
     //console.log( req.query._id ) // Datos HTTP desde query string
 
@@ -257,9 +279,15 @@ API.get("/v1/auth", (req, res) => {
     const userID = "1153778"
 
     const token = jwt.sign({ email, name, userID, expiresIn : 60 * 60 }, JWT_SECRET)
-
-    console.log( token )
     
-    res.end("Acá hay que crear JWT")
+    // res.cookie(NOMBRE, CONTENIDO, CONFIG)
+    res.cookie("_auth", token, {
+        expires : new Date( Date.now() + 1000 * 60 * 3),
+        httpOnly : true,
+        sameSite : 'Lax', // si se puede enviar a otra web o solamente en el mismo dominio
+        secure : false // permite solo por https o no
+    })
+
+    res.json({ auth : true })
 
 })
