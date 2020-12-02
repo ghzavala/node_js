@@ -190,6 +190,17 @@ API.get("/v1/pelicula", verifyToken, async (req, res) => {
     res.json(peliculas)
 })
 
+API.get("/v1/peliculaST", async (req, res) => {
+    
+    //console.log( req.query._id ) // Datos HTTP desde query string
+
+    const db = await ConnectionDB()
+
+    const peliculas = await db.collection('Peliculas').find({}).toArray()
+    
+    res.json(peliculas)
+})
+
 API.get("/v1/pelicula/:id", async (req, res) => {
 
     const { id } = req.params
