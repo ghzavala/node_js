@@ -7,6 +7,7 @@ const expressFileUpload = require("express-fileupload")
 const { MongoClient, ObjectId, ObjectID } = require("mongodb") // porque la app es cliente || si fuera servidor MongoServer, por ej
 const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
+const bcrypt = require('bcrypt')
 
 const API = express.Router()
 
@@ -271,23 +272,58 @@ API.delete("/v1/pelicula/:id", async (req, res) => {
 })
 
 /* Auth */
-API.get("/v1/auth", (req, res) => {
+API.post("/v1/auth", (req, res) => {
     
-    //const token = jwt.sign(PAYLOAD, CONFIG, SECRETKEY)
-    const email = "gzavala@metrogas.com"
-    const name = "Guille Zavala"
-    const userID = "1153778"
+    const rta = new Object()
 
-    const token = jwt.sign({ email, name, userID, expiresIn : 60 * 60 }, JWT_SECRET)
+    const { mail, pass } = req.body
+
+    const userDB = {
+        "_id":{"$oid":"5fc6ce999e319c4b99be2ba1"},
+        "name":"Han Nova Solo",
+        "mail":"han.nova@solo.com",
+        "pass":"$2b$10$w/rIGfpLBxy7CcY/AKLuWemtnT6uk3F3hWe.lGVtOO4ZGaEJblzGO"
+    }
     
-    // res.cookie(NOMBRE, CONTENIDO, CONFIG)
-    res.cookie("_auth", token, {
-        expires : new Date( Date.now() + 1000 * 60 * 3),
-        httpOnly : true,
-        sameSite : 'Lax', // si se puede enviar a otra web o solamente en el mismo dominio
-        secure : false // permite solo por https o no
+    bcrypt.compare( pass, userDB.pass, ( error, resultado ) => {
+        if( error ){
+            return res.json({ auth : false, msg : 'No pudimos verificar tu contraseña'})
+        } else if( resultado == false ) {
+            return res.json({ auth : false, msg : 'La pass no coincide'})
+        } else {
+            // La pass coincide
+
+            //const token = jwt.sign(PAYLOAD, CONFIG, SECRETKEY)
+            const token = jwt.sign({ email : userDB.mail, name : userDB.name, expiresIn : 60 * 60 }, JWT_SECRET)
+            
+            // res.cookie(NOMBRE, CONTENIDO, CONFIG)
+            res.cookie("_auth", token, {
+                expires : new Date( Date.now() + 1000 * 60 * 3),
+                httpOnly : true,
+                sameSite : 'Lax', // si se puede enviar a otra web o solamente en el mismo dominio
+                secure : false // permite solo por https o no
+            })
+
+            return res.json({ auth : true })
+
+        }
     })
 
-    res.json({ auth : true })
+})
 
+API.post('/v1/register', (req, res) => {
+    const { name, mail, pass} = req.body
+
+    bcrypt.hash(pass, 10, (error, hash) => {
+
+        if(error){
+            console.log('Como que la pass no se encripto...')
+        } else {
+            console.log('Tengo la password')
+            console.log( hash )
+            // ACA HAY QUE GUARDAR EL USUARIO CON SU PASS EN LA DB
+        }
+        
+    })
+    res.end('Mira la consola')
 })
